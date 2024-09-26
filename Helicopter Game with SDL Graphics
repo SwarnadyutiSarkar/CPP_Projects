@@ -1,0 +1,62 @@
+#include <SDL.h>
+#include <iostream>
+
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+
+class HelicopterGame {
+public:
+    HelicopterGame() : running(true), helicopterY(WINDOW_HEIGHT / 2) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+            std::cerr << "SDL could not initialize! SDL_Error: " << SDL_GetError() << std::endl;
+        }
+        window = SDL_CreateWindow("Helicopter Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
+        renderer = SDL_CreateRenderer(window, -1, 0);
+    }
+
+    ~HelicopterGame() {
+        SDL_DestroyRenderer(renderer);
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+    }
+
+    void run() {
+        SDL_Event event;
+        while (running) {
+            while (SDL_PollEvent(&event)) {
+                if (event.type == SDL_QUIT) {
+                    running = false;
+                }
+                if (event.type == SDL_KEYDOWN) {
+                    if (event.key.keysym.sym == SDLK_UP) helicopterY -= 10;
+                    if (event.key.keysym.sym == SDLK_DOWN) helicopterY += 10;
+                }
+            }
+
+            if (helicopterY < 0) helicopterY = 0;
+            if (helicopterY > WINDOW_HEIGHT - 50) helicopterY = WINDOW_HEIGHT - 50;
+
+            SDL_SetRenderDrawColor(renderer, 135, 206, 250, 255); // Sky color
+            SDL_RenderClear(renderer);
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Helicopter color
+            SDL_Rect helicopter = { 50, helicopterY, 50, 30 };
+            SDL_RenderFillRect(renderer, &helicopter);
+
+            SDL_RenderPresent(renderer);
+            SDL_Delay(16); // Roughly 60 FPS
+        }
+    }
+
+private:
+    SDL_Window* window;
+    SDL_Renderer* renderer;
+    bool running;
+    int helicopterY;
+};
+
+int main() {
+    HelicopterGame game;
+    game.run();
+    return 0;
+}
