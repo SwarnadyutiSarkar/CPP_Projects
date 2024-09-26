@@ -1,0 +1,53 @@
+#include <opencv2/opencv.hpp>
+#include <iostream>
+
+using namespace cv;
+using namespace std;
+
+class ARNavigationApp {
+public:
+    ARNavigationApp() {
+        // Open the default camera
+        camera = VideoCapture(0);
+        if (!camera.isOpened()) {
+            cerr << "Error: Cannot open camera." << endl;
+            exit(-1);
+        }
+    }
+
+    void run() {
+        Mat frame;
+        while (true) {
+            camera >> frame; // Capture a frame
+            if (frame.empty()) break;
+
+            // Get user location (simulated here)
+            double userLat = 40.7128; // Example latitude
+            double userLon = -74.0060; // Example longitude
+
+            // Overlay AR content
+            overlayNavigationInfo(frame, userLat, userLon);
+
+            // Display the frame
+            imshow("AR Navigation", frame);
+            if (waitKey(30) >= 0) break; // Exit on key press
+        }
+    }
+
+private:
+    VideoCapture camera;
+
+    void overlayNavigationInfo(Mat &frame, double latitude, double longitude) {
+        // Simulated AR overlay (e.g., a simple text overlay)
+        string info = "User Location: (" + to_string(latitude) + ", " + to_string(longitude) + ")";
+        putText(frame, info, Point(10, 30), FONT_HERSHEY_SIMPLEX, 0.6, Scalar(0, 255, 0), 2);
+        rectangle(frame, Point(10, 40), Point(400, 60), Scalar(0, 0, 0), FILLED); // Background for text
+        putText(frame, info, Point(10, 50), FONT_HERSHEY_SIMPLEX, 0.6, Scalar(255, 255, 255), 2); // White text
+    }
+};
+
+int main() {
+    ARNavigationApp app;
+    app.run();
+    return 0;
+}
