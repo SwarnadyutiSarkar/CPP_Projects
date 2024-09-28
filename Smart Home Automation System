@@ -1,0 +1,56 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Device {
+public:
+    std::string name;
+    bool status; // true = ON, false = OFF
+
+    Device(std::string deviceName) : name(deviceName), status(false) {}
+
+    void toggle() {
+        status = !status;
+        std::cout << name << " is now " << (status ? "ON" : "OFF") << std::endl;
+    }
+};
+
+class SmartHome {
+private:
+    std::vector<Device> devices;
+
+public:
+    void addDevice(const std::string& deviceName) {
+        devices.emplace_back(deviceName);
+        std::cout << deviceName << " added to smart home." << std::endl;
+    }
+
+    void toggleDevice(const std::string& deviceName) {
+        for (auto& device : devices) {
+            if (device.name == deviceName) {
+                device.toggle();
+                return;
+            }
+        }
+        std::cout << deviceName << " not found!" << std::endl;
+    }
+
+    void showDevices() {
+        std::cout << "Smart Home Devices:" << std::endl;
+        for (const auto& device : devices) {
+            std::cout << device.name << " - " << (device.status ? "ON" : "OFF") << std::endl;
+        }
+    }
+};
+
+int main() {
+    SmartHome home;
+    home.addDevice("Living Room Light");
+    home.addDevice("Thermostat");
+
+    home.showDevices();
+    home.toggleDevice("Living Room Light");
+    home.showDevices();
+
+    return 0;
+}
