@@ -1,0 +1,140 @@
+#include <iostream>
+#include <string>
+#include <vector>
+
+using namespace std;
+
+class Account {
+private:
+    string name;
+    int accountNumber;
+    double balance;
+
+public:
+    Account(string name, int accountNumber) 
+        : name(name), accountNumber(accountNumber), balance(0.0) {}
+
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            cout << "Successfully deposited: $" << amount << endl;
+        } else {
+            cout << "Deposit amount must be positive!" << endl;
+        }
+    }
+
+    void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            cout << "Successfully withdrew: $" << amount << endl;
+        } else if (amount > balance) {
+            cout << "Insufficient balance!" << endl;
+        } else {
+            cout << "Withdrawal amount must be positive!" << endl;
+        }
+    }
+
+    void displayBalance() const {
+        cout << "Account Holder: " << name << endl;
+        cout << "Account Number: " << accountNumber << endl;
+        cout << "Current Balance: $" << balance << endl;
+    }
+};
+
+class BankingSystem {
+private:
+    vector<Account> accounts;
+
+public:
+    void createAccount() {
+        string name;
+        int accountNumber;
+        cout << "Enter account holder's name: ";
+        cin >> name;
+        cout << "Enter account number: ";
+        cin >> accountNumber;
+
+        accounts.emplace_back(name, accountNumber);
+        cout << "Account created successfully!" << endl;
+    }
+
+    void depositToAccount() {
+        int accountNumber;
+        double amount;
+
+        cout << "Enter account number: ";
+        cin >> accountNumber;
+        cout << "Enter amount to deposit: ";
+        cin >> amount;
+
+        for (auto &account : accounts) {
+            if (accountNumber == accountNumber) {
+                account.deposit(amount);
+                return;
+            }
+        }
+        cout << "Account not found!" << endl;
+    }
+
+    void withdrawFromAccount() {
+        int accountNumber;
+        double amount;
+
+        cout << "Enter account number: ";
+        cin >> accountNumber;
+        cout << "Enter amount to withdraw: ";
+        cin >> amount;
+
+        for (auto &account : accounts) {
+            if (accountNumber == accountNumber) {
+                account.withdraw(amount);
+                return;
+            }
+        }
+        cout << "Account not found!" << endl;
+    }
+
+    void checkBalance() {
+        int accountNumber;
+
+        cout << "Enter account number: ";
+        cin >> accountNumber;
+
+        for (const auto &account : accounts) {
+            if (accountNumber == accountNumber) {
+                account.displayBalance();
+                return;
+            }
+        }
+        cout << "Account not found!" << endl;
+    }
+
+    void displayMenu() {
+        int choice;
+        do {
+            cout << "\nBanking System Simulator" << endl;
+            cout << "1. Create Account" << endl;
+            cout << "2. Deposit Money" << endl;
+            cout << "3. Withdraw Money" << endl;
+            cout << "4. Check Balance" << endl;
+            cout << "5. Exit" << endl;
+            cout << "Enter your choice: ";
+            cin >> choice;
+
+            switch (choice) {
+                case 1: createAccount(); break;
+                case 2: depositToAccount(); break;
+                case 3: withdrawFromAccount(); break;
+                case 4: checkBalance(); break;
+                case 5: cout << "Exiting..." << endl; break;
+                default: cout << "Invalid choice! Please try again." << endl; break;
+            }
+        } while (choice != 5);
+    }
+};
+
+int main() {
+    BankingSystem bankingSystem;
+    bankingSystem.displayMenu();
+    return 0;
+}
