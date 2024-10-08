@@ -1,0 +1,100 @@
+#include <iostream>
+#include <thread>
+#include <chrono>
+#include <vector>
+
+using namespace std;
+
+class TrafficSignal {
+private:
+    enum State { RED, YELLOW, GREEN };
+    State currentState;
+    int redDuration;
+    int yellowDuration;
+    int greenDuration;
+
+public:
+    TrafficSignal(int redTime, int yellowTime, int greenTime) 
+        : redDuration(redTime), yellowDuration(yellowTime), greenDuration(greenTime), currentState(RED) {}
+
+    void changeSignal() {
+        while (true) {
+            // RED
+            currentState = RED;
+            cout << "Traffic Signal: RED - Stop" << endl;
+            this_thread::sleep_for(chrono::seconds(redDuration));
+
+            // GREEN
+            currentState = GREEN;
+            cout << "Traffic Signal: GREEN - Go" << endl;
+            this_thread::sleep_for(chrono::seconds(greenDuration));
+
+            // YELLOW
+            currentState = YELLOW;
+            cout << "Traffic Signal: YELLOW - Prepare to Stop" << endl;
+            this_thread::sleep_for(chrono::seconds(yellowDuration));
+        }
+    }
+
+    State getCurrentState() const {
+        return currentState;
+    }
+};
+
+class Vehicle {
+private:
+    string licensePlate;
+
+public:
+    Vehicle(string plate) : licensePlate(plate) {}
+
+    string getLicensePlate() const {
+        return licensePlate;
+    }
+};
+
+class TrafficManagementSystem {
+private:
+    TrafficSignal signal;
+    vector<Vehicle> vehicles;
+
+public:
+    TrafficManagementSystem(int redTime, int yellowTime, int greenTime)
+        : signal(redTime, yellowTime, greenTime) {}
+
+    void addVehicle(string plate) {
+        vehicles.push_back(Vehicle(plate));
+        cout << "Vehicle " << plate << " has arrived." << endl;
+    }
+
+    void showVehicles() {
+        cout << "Current Vehicles at the intersection:" << endl;
+        for (const auto &vehicle : vehicles) {
+            cout << "- " << vehicle.getLicensePlate() << endl;
+        }
+    }
+
+    void startTrafficManagement() {
+        thread signalThread(&TrafficSignal::changeSignal, &signal);
+        signalThread.detach();
+
+        while (true) {
+            showVehicles();
+            this_thread::sleep_for(chrono::seconds(5)); // Display vehicles every 5 seconds
+        }
+    }
+};
+
+int main() {
+    TrafficManagementSystem tms(10, 3, 10); // 10s RED, 3s YELLOW, 10s GREEN
+
+    // Adding vehicles to the system
+    tms.addVehicle("ABC123");
+    tms.addVehicle("XYZ456");
+    tms.addVehicle("LMN789");
+
+    cout << "Starting Traffic Management System..." << endl;
+    tms.startTrafficManagement();
+
+    return 0;
+}
